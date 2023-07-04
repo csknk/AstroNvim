@@ -1,0 +1,115 @@
+snippet colours
+BLUE='\033[94m'
+GREEN='\033[32;1m'
+YELLOW='\033[33;1m'
+RED='\033[91;1m'
+RESET='\033[0m'
+BOLD='\e[1;37m'
+endsnippet
+
+snippet colfunc
+function colecho {
+	echo -e "\${2}\${1}\${RESET}"
+}
+endsnippet
+
+snippet w "wrap" i
+\"\$\{${VISUAL}\}\"
+endsnippet
+
+snippet exists
+function program_exists {
+	type "\$1" > /dev/null 2>&1
+	return $?
+}
+endsnippet
+
+snippet here_to_file
+cat <<- EOF > "\$\{$1\}"
+Message
+--------------------
+EOF
+endsnippet
+
+snippet heredoc
+cat <<- EOF
+${1:message}
+EOF
+endsnippet
+
+snippet usage
+function usage() {
+	cat <<- EOF
+	${1:This is a message}
+	\$0 ${2: parameters} 
+	EOF
+}
+endsnippet
+
+snippet debug
+current_command=
+last_command=
+trap 'current_command=$BASH_COMMAND; last_command=$current_command' DEBUG
+trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+endsnippet
+
+snippet proceed
+read -n1 -rp "${1:Do you want to proceed}? [y/N]?"
+[[ ! "${REPLY}" =~ ^(y|Y)$ ]] && { echo "Exiting."; exit 1; }
+echo
+endsnippet
+
+snippet safeproceed
+read -rp "${1:Proceed? You must type \"YES\" in all caps...}"
+[[ ! "${REPLY}" == "YES" ]] && { echo "Exiting."; exit 1; }
+${2:echo}
+endsnippet
+
+snippet saferm
+rm -rf "\$\{${1:DATADIR}:?\}"/
+endsnippet
+
+snippet isset
+[[ -v "\$\{${1:DIR}\}" || -z  "\$\{${1:DIR}\}" ]] && { echo "\\$\{${1:DIR}\} not set or set empty, see ${CONFIG_FILE}"; exit 1; }
+endsnippet
+
+snippet scignore
+# shellcheck disable=SC${1}
+endsnippet
+
+# getopt
+snippet getopt
+while getopts ":h$1$3" opt; do
+	case $opt in
+		h )  usage; exit 0
+			;;
+		$1 ) ${2:command};
+			;;
+		$3 ) ${4:command};
+			;;
+		* ) echo -e "\nOption does not exist : $OPTARG\n"; usage; exit 1
+			;;
+	esac
+done
+shift $((OPTIND-1))
+endsnippet
+
+# Bash boolean
+snippet bool
+${1:x}=false
+
+$$1 && ${2:echo "condition is true"} || ${3:echo "condition is not true"}
+${0}
+endsnippet
+
+# Bool with if
+snippet boolif
+${1:x}=false
+if $$1
+then
+	${2:echo "Condition is true."}
+else
+	${3:echo "Condition is false."}
+fi
+${0}
+endsnippet

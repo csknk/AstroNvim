@@ -10,21 +10,22 @@ vim.g.markdown_fenced_languages = {
   "json",
 }
 
-Bash_crunchbang = function()
-  if not vim.g.bash_crunchbang_autocmd_added then
-    vim.g.bash_crunchbang_autocmd_added = true
-    vim.cmd("normal! i#!/usr/bin/env bash")
-    vim.cmd("normal! o")
-    vim.cmd("normal! x")
-    vim.cmd("normal! set -euo pipefail")
-    vim.cmd("normal! oIFS=$'\\n\\t'")
-    vim.cmd("normal! o")
-    vim.cmd("normal! ^3j")
-    vim.cmd("autocmd! BufNewFile *.{sh} lua bash_crunchbang()")
-  end
-end
-
 return {
+  plugins = {
+    -- init = {
+    --   ["L3MON4D3/LuaSnip"] = { module = "" },
+    -- },
+    -- {
+    --   "L3MON4D3/LuaSnip",
+    --   config = function(plugin, opts)
+    --     require "plugins.configs.luasnip" (plugin, opts)                                                              -- include the default astronvim config that calls the setup call
+    --     require("luasnip.loaders.from_vscode").lazy_load { paths = { "/home/david/.config/nvim/lua/user/snippets" } } -- load snippets paths
+    --     -- require("luasnip.loaders.from_vscode").lazy_load { paths = { "./snippets" } } -- load snippets paths
+    --     -- require("luasnip.loaders.from_vscode").lazy_load { paths = { "./snippets" } } -- load snippets paths
+    --   end,
+    -- },
+  },
+  -- More Go stuff: https://go.googlesource.com/tools/+/refs/heads/master/gopls/doc/vim.md#neovim-config
   -- Configure AstroNvim updates
   updater = {
     remote = "origin",     -- remote to use
@@ -89,15 +90,38 @@ return {
   -- augroups/autocommands and custom filetypes also this just pure lua so
   -- anything that doesn't fit in the normal config locations above can go here
   polish = function()
-    local function skeleton()
-      vim.cmd("0put =readfile('/home/david/.config/nvim/skeleton/bash.sh')") -- Insert contents of ~/.config/nvim/skeleton/bash.sh at line 0
-      vim.api.nvim_command("normal! $")                                      -- Jump to the end of the document
-      vim.api.nvim_feedkeys("i", "n", true)                                  -- Switch to insert mode
+    -- Start certain filetypes with a template
+    local function bash_skeleton()
+      vim.cmd(string.format("0put =readfile('%s')", "/home/david/.config/nvim/skeleton/bash.sh")) -- Insert template contents
+      vim.api.nvim_command("normal! G")                                                           -- Jump to the end of the document
+      vim.api.nvim_feedkeys("o", "n", true)                                                       -- Add line & switch to insert mode
     end
-    vim.api.nvim_create_autocmd("BufNewFile", {
-      pattern = "*.sh",
-      callback = function() skeleton() end,
+    vim.api.nvim_create_autocmd("BufNewFile", { pattern = "*.sh", callback = function() bash_skeleton() end })
+
+    -- Add gates to c/c++ header files
+    local function insert_gates()
+      local gatename = vim.fn.expand("%:t"):upper():gsub("%.", "_")
+      vim.api.nvim_command("normal! i#ifndef " .. gatename)
+      vim.api.nvim_command("normal! o#define " .. gatename)
+      vim.api.nvim_command("normal! o")
+      vim.api.nvim_command("normal! Go#endif /* " .. gatename .. " */")
+      vim.api.nvim_command("normal! ^k")
+    end
+    vim.api.nvim_create_autocmd("BufNewFile", { pattern = "*.{h,hpp}", callback = function() insert_gates() end })
+
+    -- Spellcheck for specified filetypes
+    vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" },
+      { pattern = { "*.txt", "*.md", "*.tex" }, command = "setlocal spell" })
+
+    -- Organise imports on save using the logic of `goimports`
+    vim.api.nvim_create_autocmd('BufWritePre', {
+      pattern = '*.go',
+      callback = function()
+        vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' } }, apply = true })
+      end
     })
+    -- vim.api.nvim_set_keymap("n", "<leader>fp", ":!realpath %<CR>", { noremap = true })
+
     -- Set up custom filetypes
     -- vim.filetype.add {
     --   extension = {
@@ -110,5 +134,7 @@ return {
     --     ["~/%.config/foo/.*"] = "fooscript",
     --   },
     -- }
+    -- require("luasnip.loaders.from_snipmate").lazy_load({ paths = { "./lua/user/snippets" } })
+    require("luasnip.loaders.from_lua").lazy_load({ paths = { "./lua/user/luasnippets" } })
   end,
 }

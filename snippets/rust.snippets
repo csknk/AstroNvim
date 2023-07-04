@@ -1,0 +1,13 @@
+snippet newR "Constructor function returning Result"
+pub fn new(${1:args}: ${2}) -> Result<${3:Self}, &str> {
+	if $1 ${4:cond} {
+		return Err("${5}");
+	}
+	let ${6:var} = ${7};
+	Ok($3 { ${8} })
+}
+endsnippet
+
+snippet ok
+Ok($1)
+endsnippet

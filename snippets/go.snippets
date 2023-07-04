@@ -1,0 +1,100 @@
+snippet jsonPrint
+b, err := json.MarshalIndent(${1:structName}, "", "\t")
+assert.Equal(t, nil, err)
+fmt.Println(string(b))
+endsnippet
+
+snippet infun "function def" b
+func ${1:name}(${2:params}) ${3:returnType} {
+	${4:${VISUAL}}
+}
+endsnippet
+
+snippet readinlines "Read lines from filepath to slice of strings" b
+${1:f}, err := os.Open(${2:inFilePath})
+if err != nil {
+	log.Fatal(err)
+}
+defer ${1:f}.Close()
+sc := bufio.NewScanner(f)
+${3:lines} := []string{}
+for sc.Scan() {
+	${3:lines} = append(${3:lines}, sc.Text())
+}
+endsnippet
+
+snippet openwrite "Open a file for writing/reading" b
+${1:outfile}, err := os.OpenFile(${2:path}, ${3:os.O_CREATE|os.O_RDWR}, ${4:0644})
+if err != nil {
+	${5:log.Fatal(err)}
+}
+defer ${1:outfile}.Close()
+endsnippet
+
+snippet connect "Connect to a Tendermint node" b
+// Establish a connection to Tendermint node
+nc, err := qredochain.NewNodeConnector(${1:config.HostIP}+":"+${2:config.Port}, nil)
+if err != nil {
+	log.Fatal(err)
+}
+defer nc.Stop()
+endsnippet
+
+snippet rce "Return custom error"
+return fmt.Errorf("${1:message}${2:%s}: %w", ${3:var}, err)
+endsnippet
+
+snippet rne "Return new error"
+return fmt.Errorf("${1:error message}")
+endsnippet
+
+snippet loglines "Log line numbers"
+log.SetFlags(log.LstdFlags | log.Lshortfile)
+endsnippet
+
+snippet logtofile "Log a message to a file"
+func logToFile(${1:message} string) {
+	f, err := os.OpenFile("/home/david/logs/${2:`date +"%d-%m-%Y:%H:%M:%S"`.log}", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	fmt.Fprintf(w, "%s\n---\n", message)
+	w.Flush()
+}
+endsnippet
+
+snippet qrlicence "Qredo licence block"
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
+endsnippet
+
+snippet anonslice "Anon slice of structs"
+var ${1} = []struct {
+	${2} ${3}
+}{
+	{}
+}
+endsnippet
+
+snippet ignore "Mark for compiler ignore"
+//go:build test
+endsnippet
+

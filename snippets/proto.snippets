@@ -1,0 +1,14 @@
+snippet proto
+syntax = "proto3";
+package ${1:package.v1};
+
+option go_package = "github.com/csknk/api/${2:package_v1}";
+
+endsnippet
+
+
+snippet message
+message ${1:Name} {
+	${2:type} ${3:value} = 1;
+}
+endsnippet

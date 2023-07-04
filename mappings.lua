@@ -9,13 +9,24 @@ return {
     -- second key is the lefthand side of the map
     -- mappings seen under group name "Buffer"
     ["<leader>bn"] = { "<cmd>tabnew<cr>", desc = "New tab" },
+    ["<leader>fp"] = { "<cmd>echo expand('%:p')<cr>", desc = "Get filepath" },
+    -- ["<leader>fe"] = {
+    --   function()
+    --     vim.cmd("echo expand('%:p')")
+    --   end,
+    --   desc = "Get filepath",
+    -- },
     ["<leader>bD"] = {
       function()
-        require("astronvim.utils.status").heirline.buffer_picker(function(bufnr) require("astronvim.utils.buffer").close(bufnr) end)
+        require("astronvim.utils.status").heirline.buffer_picker(function(bufnr)
+          require("astronvim.utils.buffer").close(
+            bufnr)
+        end)
       end,
       desc = "Pick to close",
     },
-    -- tables with the `name` key will be registered with which-key if it's installed
+    -- ["<leader>fp"] = { "print_realpath()<CR>", noremap = true },
+    -- tiables with the `name` key will be registered with which-key if it's installed
     -- this is useful for naming menus
     ["<leader>b"] = { name = "Buffers" },
     -- quick save
